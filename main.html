@@ -62,11 +62,11 @@
 <body>
 
 <div class="container">
-    <span class="typelang"><a href="/profile">Меню</a></span>
+    <span class="typelang"><a href="#">Меню</a></span>
 </div>
 
 <script>
-    let list = {
+    const list = {
         1:{"name":"пункт 1", "sub":{
             1:{"name":"пункт 1.1"},
             2:{"name":"пункт 1.2"},
@@ -108,11 +108,11 @@
         4:{"name":"пункт 4"}
     }
 
-    let menu = document.getElementsByClassName('typelang')[0],
-            over = false,
+    const menu = document.getElementsByClassName('typelang')[0],
             time = [],
             menu_dict = {},
             open_dict = {};
+    let over = false;
 
     function addEventHandler(n, t, f){
         if (n.addEventListener){
@@ -128,7 +128,6 @@
 
         constructor() {
             this.a = 1;
-            this.b = 0;
         }
 
         incr(){
@@ -137,29 +136,29 @@
 
     }
 
-    let seq = new Sequence();
+    const seq = new Sequence();
 
     class MenuList {
 
         constructor(j) {
-            let arr = [];
-            let el = document.createElement("div");
+            const arr = [];
+            const el = document.createElement("div");
             el.className = 'menu';
-            let tb = document.createElement("table");
+            const tb = document.createElement("table");
             tb.className = 'menu_pt';
 
-            for(let k in j){
+            for(const k in j){
                 if(j.hasOwnProperty(k)){
-                    let tr = document.createElement("tr");
-                    let td = document.createElement("td");
-                    let sp = document.createElement("span");
+                    const tr = document.createElement("tr");
+                    const td = document.createElement("td");
+                    const sp = document.createElement("span");
                     sp.className = 'punkt';
                     if(j[k]["sub"]){
                         sp.id = seq.incr();
-                        let di = document.createElement("div");
+                        const di = document.createElement("div");
                         di.className = 'triangle';
                         td.append(di);
-                        let sub = new MenuList(j[k]["sub"]);
+                        const sub = new MenuList(j[k]["sub"]);
                         menu_dict[sp.id] = sub.create_menu();
                         arr.push(sp.id);
                     }
@@ -177,7 +176,7 @@
 
             if(arr.length>1){
                 arr.forEach(function(el){
-                    let ar = [];
+                    const ar = [];
                     for (let i=0;arr.length>i;i++){
                         if(arr[i]!=el){ar.push(arr[i])}
                     }
@@ -191,14 +190,14 @@
         }
     }
 
-    let menu_inst = new MenuList(list);
+    const menu_inst = new MenuList(list);
     menu_dict[0] = menu_inst.create_menu();
-
+    
     for (let i in menu_dict){
         if(menu_dict.hasOwnProperty(i)){
             menu.append(menu_dict[i]);
-            let menu_link = document.getElementById(i.toString());
             if(i>0){
+                const menu_link = document.getElementById(i.toString()).parentNode;
                 addEventHandler(menu_link, 'mouseover', function(){
                     if (time[i]) {
                         clearTimeout(time[i]);
@@ -208,11 +207,12 @@
                             for(let ii=el;time.length>ii;ii++){
                                 if(i!=ii){
                                     menuFade(menu_dict[ii],0);
+                                    time[ii] = null;
                                 }
                             }
                         });
                     }
-                    menuShow(menu_dict[i], menu_link.previousElementSibling.getBoundingClientRect(), 400, -20, -15);
+                    menuShow(menu_dict[i], menu_link.childNodes[0].getBoundingClientRect(), 400, -20, -15);
                 });
                 addEventHandler(menu_link, 'mouseout', function(){
                     time[i] = setTimeout(function(){
@@ -220,10 +220,13 @@
                     }, 400);
                 });
                 addEventHandler(menu_dict[i], 'mouseover', function(){
+                    console.log(time);
                     for(let o=0;o<=i;o++){
                         if (time[o]) {
                             clearTimeout(time[o]);
+                            menuShow(menu_dict[o], 400);
                         }
+                        menuShow(menu_dict[i], menu_link.childNodes[0].getBoundingClientRect(), 400, -20, -15);
                     }
                 });
                 addEventHandler(menu_dict[i], 'mouseout', function(){
@@ -234,31 +237,23 @@
             }
         }
     }
-
     function menuShow(m, c, ms, top, left){
         over = true;
         if(m.style.opacity !== '1'){
-            m.style.top = c.top + pageYOffset + top + 'px';
-            m.style.left = c.left + pageXOffset - left + 'px';
-            m.style.transition = 'visibility '+ms+'ms, opacity '+ms+'ms';
+            if(c&&ms&&top&&left){
+                m.style.top = c.top + pageYOffset + top + 'px';
+                m.style.left = c.left + pageXOffset - left + 'px';
+                m.style.transition = 'visibility '+ms+'ms, opacity '+ms+'ms';
+            }
             m.style.visibility = 'visible';
             m.style.opacity = '1';
         }
     }
-
     function menuFade(m, ms){
         m.style.visibility = 'hidden';
         m.style.transition = 'visibility '+ms+'ms, opacity '+ms+'ms';
         m.style.opacity = '0';
     }
-
-    function overMenu() {
-        if (time[0]) {
-            clearTimeout(time[0]);
-        }
-        menuShow(menu_dict[0], menu.getBoundingClientRect(), 400, 25, 5);
-    }
-
     function closeAllOut() {
         over = false;
         time[0] = setTimeout(function(){
@@ -269,7 +264,6 @@
             }
         },400);
     }
-
     function closeAllClick(){
         if(!over){
             for(let k in menu_dict){
@@ -279,8 +273,12 @@
             }
         }
     }
-
-    addEventHandler(menu, 'mouseover', overMenu);
+    addEventHandler(menu, 'mouseover', function(){
+            if (time[0]) {
+                clearTimeout(time[0]);
+            }
+            menuShow(menu_dict[0], menu.getBoundingClientRect(), 400, 25, 5);
+    });
     addEventHandler(menu, 'mouseout', closeAllOut);
     addEventHandler(document, 'mousedown', closeAllClick);
 

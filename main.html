@@ -220,13 +220,12 @@
                     }, 400);
                 });
                 addEventHandler(menu_dict[i], 'mouseover', function(){
-                    console.log(time);
                     for(let o=0;o<=i;o++){
                         if (time[o]) {
                             clearTimeout(time[o]);
-                            menuShow(menu_dict[o], 400);
+                            menuShow(menu_dict[o]);
                         }
-                        menuShow(menu_dict[i], menu_link.childNodes[0].getBoundingClientRect(), 400, -20, -15);
+                        menuShow(menu_dict[i]);
                     }
                 });
                 addEventHandler(menu_dict[i], 'mouseout', function(){

@@ -172,8 +172,8 @@ function menuShow(m, c, ms, top, left){
     over = true;
     if(m.style.opacity !== '1'){
         if(c&&ms&&top&&left){
-            m.style.top = c.top + pageYOffset + top + 'px';
-            m.style.left = c.left + pageXOffset - left + 'px';
+            m.style.top = c.top + top + 'px';
+            m.style.left = c.left - left + 'px';
             m.style.transition = 'visibility '+ms+'ms, opacity '+ms+'ms';
         }
         m.style.visibility = 'visible';
